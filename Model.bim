@@ -1,0 +1,414 @@
+{
+  "name": "SemanticModel",
+  "compatibilityLevel": 1600,
+  "model": {
+    "culture": "en-GB",
+    "dataSources": [
+      {
+        "type": "structured",
+        "name": "SQL/localhost;SIMM",
+        "connectionDetails": {
+          "protocol": "tds",
+          "address": {
+            "server": "localhost",
+            "database": "SIMM"
+          },
+          "authentication": null,
+          "query": null
+        },
+        "credential": {
+          "AuthenticationKind": "UsernamePassword",
+          "kind": "SQL",
+          "path": "localhost;SIMM",
+          "EncryptConnection": false
+        }
+      }
+    ],
+    "tables": [
+      {
+        "name": "Constants IRCurveRiskWeights",
+        "isHidden": true,
+        "columns": [
+          {
+            "name": "IRCurveBucketId",
+            "dataType": "int64",
+            "sourceColumn": "IRCurveBucketId"
+          },
+          {
+            "name": "IRTenorId",
+            "dataType": "int64",
+            "sourceColumn": "IRTenorId"
+          },
+          {
+            "name": "Value",
+            "dataType": "double",
+            "sourceColumn": "Value"
+          },
+          {
+            "type": "calculated",
+            "name": "BucketTenorId",
+            "dataType": "int64",
+            "isDataTypeInferred": true,
+            "expression": "[IRCurveBucketId]+[IRTenorId]*10"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = #\"SQL/localhost;SIMM\",",
+                "    Constants_IRCurveRiskWeights = Source{[Schema=\"Constants\",Item=\"IRCurveRiskWeights\"]}[Data]",
+                "in",
+                "    Constants_IRCurveRiskWeights"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "Sensitivities IRCurve",
+        "columns": [
+          {
+            "name": "ProductClassId",
+            "dataType": "int64",
+            "isHidden": true,
+            "sourceColumn": "ProductClassId"
+          },
+          {
+            "name": "ISOCurrencyId",
+            "dataType": "int64",
+            "isHidden": true,
+            "sourceColumn": "ISOCurrencyId"
+          },
+          {
+            "name": "IRCurveBucketId",
+            "dataType": "int64",
+            "isHidden": true,
+            "sourceColumn": "IRCurveBucketId"
+          },
+          {
+            "name": "IRTenorId",
+            "dataType": "int64",
+            "isHidden": true,
+            "sourceColumn": "IRTenorId"
+          },
+          {
+            "name": "IRSubCurveId",
+            "dataType": "int64",
+            "isHidden": true,
+            "sourceColumn": "IRSubCurveId"
+          },
+          {
+            "name": "Sensitivity",
+            "dataType": "double",
+            "sourceColumn": "Value"
+          },
+          {
+            "type": "calculated",
+            "name": "BucketTenorId",
+            "dataType": "int64",
+            "isDataTypeInferred": true,
+            "isHidden": true,
+            "expression": "[IRCurveBucketId]+[IRTenorId]*10"
+          },
+          {
+            "type": "calculated",
+            "name": "Risk Weight",
+            "dataType": "double",
+            "isDataTypeInferred": true,
+            "expression": "RELATED('Constants IRCurveRiskWeights'[Value])"
+          },
+          {
+            "type": "calculated",
+            "name": "Product Class",
+            "dataType": "string",
+            "isDataTypeInferred": true,
+            "expression": "RELATED('Constants ProductClasses'[Value])"
+          },
+          {
+            "type": "calculated",
+            "name": "ISO Currency",
+            "dataType": "string",
+            "isDataTypeInferred": true,
+            "expression": "RELATED('Constants ISOCurrencies'[Value])"
+          },
+          {
+            "type": "calculated",
+            "name": "Bucket",
+            "dataType": "int64",
+            "isDataTypeInferred": true,
+            "expression": "RELATED('Constants IRCurveBuckets'[Value])"
+          },
+          {
+            "type": "calculated",
+            "name": "Tenor",
+            "dataType": "string",
+            "isDataTypeInferred": true,
+            "expression": "RELATED('Constants IRTenors'[Value])"
+          },
+          {
+            "type": "calculated",
+            "name": "Sub Curve",
+            "dataType": "string",
+            "isDataTypeInferred": true,
+            "expression": "RELATED('Constants IRSubCurves'[Value])"
+          },
+          {
+            "type": "calculated",
+            "name": "Product of Sens and Risk Weight",
+            "dataType": "double",
+            "isDataTypeInferred": true,
+            "expression": "[Sensitivity]*[Risk Weight]"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = #\"SQL/localhost;SIMM\",",
+                "    Sensitivities_IRCurve = Source{[Schema=\"Sensitivities\",Item=\"IRCurve\"]}[Data]",
+                "in",
+                "    Sensitivities_IRCurve"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "Constants IRCurveBuckets",
+        "isHidden": true,
+        "columns": [
+          {
+            "name": "Id",
+            "dataType": "int64",
+            "sourceColumn": "Id"
+          },
+          {
+            "name": "Value",
+            "dataType": "int64",
+            "sourceColumn": "Value"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = #\"SQL/localhost;SIMM\",",
+                "    Constants_IRCurveBuckets = Source{[Schema=\"Constants\",Item=\"IRCurveBuckets\"]}[Data]",
+                "in",
+                "    Constants_IRCurveBuckets"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "Constants IRTenors",
+        "isHidden": true,
+        "columns": [
+          {
+            "name": "Id",
+            "dataType": "int64",
+            "sourceColumn": "Id"
+          },
+          {
+            "name": "Value",
+            "dataType": "string",
+            "sourceColumn": "Value"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = #\"SQL/localhost;SIMM\",",
+                "    Constants_IRTenors = Source{[Schema=\"Constants\",Item=\"IRTenors\"]}[Data]",
+                "in",
+                "    Constants_IRTenors"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "Constants IRSubCurves",
+        "isHidden": true,
+        "columns": [
+          {
+            "name": "Id",
+            "dataType": "int64",
+            "sourceColumn": "Id"
+          },
+          {
+            "name": "Value",
+            "dataType": "string",
+            "sourceColumn": "Value"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = #\"SQL/localhost;SIMM\",",
+                "    Constants_IRSubCurves = Source{[Schema=\"Constants\",Item=\"IRSubCurves\"]}[Data]",
+                "in",
+                "    Constants_IRSubCurves"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "Constants ISOCurrencies",
+        "isHidden": true,
+        "columns": [
+          {
+            "name": "Id",
+            "dataType": "int64",
+            "sourceColumn": "Id"
+          },
+          {
+            "name": "Value",
+            "dataType": "string",
+            "sourceColumn": "Value"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = #\"SQL/localhost;SIMM\",",
+                "    Constants_ISOCurrencies = Source{[Schema=\"Constants\",Item=\"ISOCurrencies\"]}[Data]",
+                "in",
+                "    Constants_ISOCurrencies"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "Constants ProductClasses",
+        "isHidden": true,
+        "columns": [
+          {
+            "name": "Id",
+            "dataType": "int64",
+            "sourceColumn": "Id"
+          },
+          {
+            "name": "Value",
+            "dataType": "string",
+            "sourceColumn": "Value"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = #\"SQL/localhost;SIMM\",",
+                "    Constants_ProductClasses = Source{[Schema=\"Constants\",Item=\"ProductClasses\"]}[Data]",
+                "in",
+                "    Constants_ProductClasses"
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "relationships": [
+      {
+        "name": "ec8d75c0-ed25-4341-84b1-2a0448cc15d9",
+        "fromTable": "Sensitivities IRCurve",
+        "fromColumn": "IRCurveBucketId",
+        "toTable": "Constants IRCurveBuckets",
+        "toColumn": "Id"
+      },
+      {
+        "name": "928a7fa5-b2fb-4d12-b2a0-74889fe82f4e",
+        "fromTable": "Sensitivities IRCurve",
+        "fromColumn": "IRSubCurveId",
+        "toTable": "Constants IRSubCurves",
+        "toColumn": "Id"
+      },
+      {
+        "name": "f710aaca-db69-496b-875e-548ad64bc631",
+        "fromTable": "Sensitivities IRCurve",
+        "fromColumn": "IRTenorId",
+        "toTable": "Constants IRTenors",
+        "toColumn": "Id"
+      },
+      {
+        "name": "96986d7c-89c4-496a-b9de-bb8333904ff7",
+        "fromTable": "Sensitivities IRCurve",
+        "fromColumn": "ISOCurrencyId",
+        "toTable": "Constants ISOCurrencies",
+        "toColumn": "Id"
+      },
+      {
+        "name": "19684b38-a0a1-4c10-a1b1-d9f4a6ac4468",
+        "fromTable": "Sensitivities IRCurve",
+        "fromColumn": "ProductClassId",
+        "toTable": "Constants ProductClasses",
+        "toColumn": "Id"
+      },
+      {
+        "name": "d784b1e9-cc56-45cf-bab8-7289099cf8db",
+        "fromTable": "Constants IRCurveRiskWeights",
+        "fromColumn": "IRTenorId",
+        "toTable": "Constants IRTenors",
+        "toColumn": "Id",
+        "isActive": false
+      },
+      {
+        "name": "b9f3b0f8-819c-40b2-a54c-db8d238b65b7",
+        "fromTable": "Constants IRCurveRiskWeights",
+        "fromColumn": "IRCurveBucketId",
+        "toTable": "Constants IRCurveBuckets",
+        "toColumn": "Id",
+        "isActive": false
+      },
+      {
+        "name": "e336937a-e59b-4bb8-8422-a1045cdc6b1f",
+        "fromTable": "Sensitivities IRCurve",
+        "fromColumn": "BucketTenorId",
+        "toTable": "Constants IRCurveRiskWeights",
+        "toColumn": "BucketTenorId"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "ClientCompatibilityLevel",
+        "value": "700"
+      }
+    ]
+  },
+  "id": "SemanticModel"
+}
